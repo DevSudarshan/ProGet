@@ -99,18 +99,9 @@
             margin-bottom: 2rem;
             background-color: #ffffff;
         }
-        #searchResults {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        #searchResults h5 {
-            color: #000000;
-        }
-        #searchResults p {
-            color: #333333;
+        #partInfoModal .modal-body {
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -138,14 +129,25 @@
             <div class="widget-card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <select id="vehicleType" class="form-select">
+                        <div class="col-md-2 mb-3">
+                            <select id="vehicleType" class="form-select" onchange="updateSubOptions()">
                                 <option value="bike">Bike</option>
                                 <option value="car">Car</option>
-                                <option value="other">Other Vehicle</option>
+                                <option value="fuel">Fuel</option>
+                                <option value="etc">Etc</option>
                             </select>
                         </div>
-                        <div class="col-md-7 mb-3">
+                        <div class="col-md-2 mb-3">
+                            <select id="company" class="form-select" disabled>
+                                <option value="">Select Company</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <select id="fuelType" class="form-select" disabled>
+                                <option value="">Select Fuel Type</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <input type="text" id="partName" class="form-control" placeholder="Enter part name (e.g., Tyre)">
                         </div>
                         <div class="col-md-2 mb-3">
@@ -154,7 +156,6 @@
                     </div>
                 </div>
             </div>
-            <div id="searchResults"></div>
         </div>
     </section>
 
@@ -305,6 +306,21 @@
         </div>
     </div>
 
+    <!-- Part Info Modal -->
+    <div class="modal fade" id="partInfoModal" tabindex="-1" aria-labelledby="partInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="partInfoModalLabel">Part Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="partInfoContent">
+                    <p>Please wait while we fetch the part information...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Bike Care & Travel. All rights reserved.</p>
@@ -314,39 +330,80 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Part Search Script -->
     <script>
+        const companies = {
+            bike: ['Hero', 'Honda', 'Bajaj', 'TVS'],
+            car: ['Maruti', 'Hyundai', 'Tata', 'Toyota']
+        };
+        const fuelTypes = {
+            bike: ['Petrol', 'Electric'],
+            car: ['Petrol', 'Diesel', 'Electric']
+        };
+
+        function updateSubOptions() {
+            const vehicleType = document.getElementById('vehicleType').value;
+            const companySelect = document.getElementById('company');
+            const fuelTypeSelect = document.getElementById('fuelType');
+            companySelect.disabled = ['fuel', 'etc'].includes(vehicleType);
+            fuelTypeSelect.disabled = ['fuel', 'etc'].includes(vehicleType);
+
+            companySelect.innerHTML = '<option value="">Select Company</option>';
+            fuelTypeSelect.innerHTML = '<option value="">Select Fuel Type</option>';
+
+            if (vehicleType === 'bike' || vehicleType === 'car') {
+                companies[vehicleType].forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company;
+                    option.textContent = company;
+                    companySelect.appendChild(option);
+                });
+                fuelTypes[vehicleType].forEach(fuel => {
+                    const option = document.createElement('option');
+                    option.value = fuel;
+                    option.textContent = fuel;
+                    fuelTypeSelect.appendChild(option);
+                });
+                companySelect.disabled = false;
+                fuelTypeSelect.disabled = false;
+            }
+        }
+
         function searchPart() {
-            const vehicle = document.getElementById('vehicleType').value;
-            const part = document.getElementById('partName').value.trim();
-            if (!part) {
+            const vehicleType = document.getElementById('vehicleType').value;
+            const company = document.getElementById('company').value || '';
+            const fuelType = document.getElementById('fuelType').value || '';
+            const partName = document.getElementById('partName').value.trim();
+            if (!partName) {
                 alert('Please enter a part name.');
                 return;
             }
-            const query = `${vehicle} ${part} price India short info`;
-            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
-            fetch(apiUrl)
+
+            const query = `${vehicleType} ${company} ${fuelType} ${partName} price India short info`.replace(/\s+/g, '+');
+            const googleUrl = `https://www.google.com/search?q=${query}`;
+            const modal = new bootstrap.Modal(document.getElementById('partInfoModal'));
+            modal.show();
+
+            // Mock fetch to simulate Google search (replace with actual API or proxy in production)
+            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(googleUrl)}`)
                 .then(response => response.json())
                 .then(data => {
-                    const resultsDiv = document.getElementById('searchResults');
-                    resultsDiv.innerHTML = '';
-                    if (data.Abstract) {
-                        resultsDiv.innerHTML += `<h5>Summary</h5><p>${data.Abstract}</p>`;
-                    }
-                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                        resultsDiv.innerHTML += `<h5>Related Info</h5>`;
-                        data.RelatedTopics.forEach(topic => {
-                            if (topic.Text) {
-                                resultsDiv.innerHTML += `<p>${topic.Text}</p>`;
-                            }
-                        });
-                    }
-                    if (!data.Abstract && data.RelatedTopics.length === 0) {
-                        resultsDiv.innerHTML = '<p>No results found.</p>';
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, 'text/html');
+                    const description = doc.querySelector('div[data-sncf]')?.textContent || 'No detailed info available.';
+                    const priceMatch = description.match(/₹\d{1,3}(?:,\d{3})*/);
+                    const price = priceMatch ? priceMatch[0] : 'Price not found';
+                    document.getElementById('partInfoContent').innerHTML = `
+                        <h5>${partName} Details</h5>
+                        <p><strong>Estimated Price:</strong> ${price}</p>
+                        <p><strong>Description:</strong> ${description.substring(0, 200)}...</p>
+                    `;
                 })
                 .catch(() => {
-                    document.getElementById('searchResults').innerHTML = '<p>Error fetching results.</p>';
+                    document.getElementById('partInfoContent').innerHTML = '<p>Error fetching part information.</p>';
                 });
         }
+
+        // Initialize sub-options on page load
+        window.onload = updateSubOptions;
     </script>
 </body>
 </html>
