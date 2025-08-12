@@ -14,32 +14,33 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fa;
-            color: #1a2a44;
+            background-color: #fffdf0;
+            color: #000000;
         }
         .navbar {
-            background-color: #1a2a44;
+            background-color: #000000;
             padding: 1.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .navbar-brand {
             font-weight: 700;
-            color: #fff !important;
+            color: #ffd700 !important;
             font-size: 1.5rem;
         }
         .nav-link {
-            color: #c0c7d6 !important;
+            color: #ffd700 !important;
             font-weight: 500;
             transition: color 0.3s;
         }
         .nav-link:hover {
-            color: #fff !important;
+            color: #ffffff !important;
         }
         .section-title {
             font-weight: 600;
             margin-bottom: 2rem;
             position: relative;
             display: inline-block;
+            color: #000000;
         }
         .section-title:after {
             content: '';
@@ -48,45 +49,47 @@
             left: 0;
             width: 50%;
             height: 3px;
-            background-color: #1a2a44;
+            background-color: #ffd700;
         }
         table {
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border-radius: 10px;
             overflow: hidden;
+            background-color: #ffffff;
         }
         th {
-            background-color: #1a2a44;
-            color: #fff;
+            background-color: #000000;
+            color: #ffd700;
         }
         tr:hover {
-            background-color: #e6eaf0;
+            background-color: #fffdf0;
         }
         .btn-premium {
-            background-color: #1a2a44;
-            color: #fff;
+            background-color: #ffd700;
+            color: #000000;
             border-radius: 50px;
             padding: 8px 16px;
             border: none;
             transition: background-color 0.3s, transform 0.2s;
         }
         .btn-premium:hover {
-            background-color: #2a4066;
+            background-color: #e6c200;
             transform: scale(1.05);
         }
         footer {
-            background-color: #1a2a44;
-            color: #c0c7d6;
+            background-color: #000000;
+            color: #ffd700;
             padding: 2rem 0;
             text-align: center;
         }
         .modal-content {
             border-radius: 15px;
             border: none;
+            background-color: #ffffff;
         }
         .modal-header {
-            background-color: #1a2a44;
-            color: #fff;
+            background-color: #000000;
+            color: #ffd700;
             border-radius: 15px 15px 0 0;
         }
         .widget-card {
@@ -94,6 +97,20 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             margin-bottom: 2rem;
+            background-color: #ffffff;
+        }
+        #searchResults {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #searchResults h5 {
+            color: #000000;
+        }
+        #searchResults p {
+            color: #333333;
         }
     </style>
 </head>
@@ -118,7 +135,7 @@
     <section class="py-5">
         <div class="container">
             <h2 class="section-title">Search for Vehicle Parts</h2>
-            <div class="card widget-card">
+            <div class="widget-card">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
@@ -137,6 +154,7 @@
                     </div>
                 </div>
             </div>
+            <div id="searchResults"></div>
         </div>
     </section>
 
@@ -304,8 +322,30 @@
                 return;
             }
             const query = `${vehicle} ${part} price India short info`;
-            const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            window.open(googleUrl, '_blank');
+            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`;
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = '';
+                    if (data.Abstract) {
+                        resultsDiv.innerHTML += `<h5>Summary</h5><p>${data.Abstract}</p>`;
+                    }
+                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                        resultsDiv.innerHTML += `<h5>Related Info</h5>`;
+                        data.RelatedTopics.forEach(topic => {
+                            if (topic.Text) {
+                                resultsDiv.innerHTML += `<p>${topic.Text}</p>`;
+                            }
+                        });
+                    }
+                    if (!data.Abstract && data.RelatedTopics.length === 0) {
+                        resultsDiv.innerHTML = '<p>No results found.</p>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('searchResults').innerHTML = '<p>Error fetching results.</p>';
+                });
         }
     </script>
 </body>
