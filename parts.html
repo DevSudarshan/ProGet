@@ -382,7 +382,7 @@
             const modal = new bootstrap.Modal(document.getElementById('partInfoModal'));
             modal.show();
 
-            // Mock fetch to simulate Google search (replace with actual API or proxy in production)
+            // Mock fetch with fallback data
             fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(googleUrl)}`)
                 .then(response => response.json())
                 .then(data => {
@@ -397,8 +397,21 @@
                         <p><strong>Description:</strong> ${description.substring(0, 200)}...</p>
                     `;
                 })
-                .catch(() => {
-                    document.getElementById('partInfoContent').innerHTML = '<p>Error fetching part information.</p>';
+                .catch(error => {
+                    console.error('Search failed:', error);
+                    // Fallback mock data
+                    const mockData = {
+                        'Tyre': { price: '₹1,500', desc: 'High-grip rubber tyre for bikes, suitable for all terrains.' },
+                        'Brake Pads': { price: '₹800', desc: 'Ceramic brake pads with high durability.' },
+                        'Battery': { price: '₹4,500', desc: 'Maintenance-free car battery, 12V 45Ah.' }
+                    };
+                    const fallback = mockData[partName] || { price: 'Price not available', desc: 'No information found for this part.' };
+                    document.getElementById('partInfoContent').innerHTML = `
+                        <h5>${partName} Details</h5>
+                        <p><strong>Estimated Price:</strong> ${fallback.price}</p>
+                        <p><strong>Description:</strong> ${fallback.desc}</p>
+                        <p><em>Note: Real-time data failed. Showing fallback info. Check network or use Google Custom Search API for accuracy.</em></p>
+                    `;
                 });
         }
 
