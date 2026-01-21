@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Bike Care & Travel</title>
@@ -9,6 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
 
 <style>
 :root{
@@ -22,32 +22,39 @@
 body{font-family:Montserrat;background:var(--dark-bg);color:var(--text-dark)}
 .light-mode{background:var(--light-bg);color:var(--text-light)}
 .navbar{background:#0b0b12}
-.card{background:var(--dark-card);border-radius:16px}
-.light-mode .card{background:#ffffff;color:#1a2a44}
-.btn-premium{background:linear-gradient(135deg,#7c4dff,#512da8);color:#fff;border-radius:50px;padding:10px 22px}
+.card{background:var(--dark-card);border-radius:16px;padding:15px}
+.light-mode .card{background:#fff;color:#1a2a44}
+.btn-premium{background:linear-gradient(135deg,#7c4dff,#512da8);color:#fff;border-radius:50px;padding:10px 22px;border:none}
 #map{height:420px;border-radius:20px}
+li{list-style:none;margin-bottom:6px}
 </style>
 </head>
 
 <body>
+
 <nav class="navbar navbar-dark px-3">
 <span class="navbar-brand">🏍 Bike Care</span>
-<div>
-<button class="btn btn-sm btn-premium me-2" onclick="toggleTheme()">🌙 / ☀️</button>
-<a href="parts.html" class="btn btn-sm btn-premium">Parts</a>
-</div>
+<button class="btn btn-sm btn-premium" onclick="toggleTheme()">🌙 / ☀️</button>
 </nav>
 
 <div class="container py-4">
 <h4>📍 Map</h4>
 <div id="map"></div>
 
+<!-- Turn by turn panel -->
+<div class="card mt-3">
+<h5>🧭 Turn-by-Turn Directions</h5>
+<div id="directions" style="max-height:200px; overflow-y:auto;"></div>
+<p class="mt-2"><strong>ETA:</strong> <span id="eta">--</span></p>
+<p><strong>Distance:</strong> <span id="distanceInfo">--</span></p>
+</div>
+
 <input id="destination" class="form-control mt-3" placeholder="Enter destination">
 <button class="btn btn-premium mt-2" onclick="route()">🧭 Route</button>
 <button class="btn btn-premium mt-2 ms-2" onclick="saveTrip()">💾 Save Trip</button>
 <button class="btn btn-premium mt-2 ms-2" onclick="findFuel()">⛽ Nearest Fuel</button>
 
-<h5 class="mt-3">Saved Trips</h5>
+<h5 class="mt-3">Saved Trips (max 6)</h5>
 <ul id="tripList"></ul>
 </div>
 
@@ -56,171 +63,152 @@ body{font-family:Montserrat;background:var(--dark-bg);color:var(--text-dark)}
 <input id="fuel" class="form-control mb-2" placeholder="Fuel Filled (litres)">
 <input id="distance" class="form-control mb-2" placeholder="Distance Covered (km)">
 <button class="btn btn-premium" onclick="calcMileage()">Calculate</button>
-<p id="mileageResult" class="mt-2"></p>
+<p id="mileageResult"></p>
 </div>
 
 <div class="container py-4">
 <h4>🔧 Service Tracker</h4>
 <input id="lastService" class="form-control mb-2" placeholder="Last Service KM">
 <input id="currentKm" class="form-control mb-2" placeholder="Current KM">
-<button class="btn btn-premium" onclick="checkService()">Check Service</button>
-<p id="serviceResult" class="mt-2"></p>
+<button class="btn btn-premium" onclick="checkService()">Check</button>
+<p id="serviceResult"></p>
 </div>
 
 <div class="container py-4">
 <h4>🚘 Vehicle Information (RTO)</h4>
-
-<input id="vehicleNo" class="form-control mb-2"
-placeholder="Enter Vehicle Number (e.g. MH12AB1234)">
-
-<button class="btn btn-premium" onclick="openRTO()">
-Check Vehicle Details
-</button>
+<input id="vehicleNo" class="form-control mb-2" placeholder="MH12AB1234">
+<button class="btn btn-premium" onclick="openRTO()">Check Vehicle</button>
 </div>
 
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
 <script>
-let map,userLoc,routeLine;
+let map, userLoc, routingControl;
 
+// Init map
 navigator.geolocation.getCurrentPosition(p=>{
-userLoc=[p.coords.latitude,p.coords.longitude];
-map=L.map('map').setView(userLoc,14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-L.marker(userLoc).addTo(map).bindPopup("You are here").openPopup();
-loadTrips();
+    userLoc=[p.coords.latitude,p.coords.longitude];
+    map=L.map('map').setView(userLoc,14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker(userLoc).addTo(map).bindPopup("You are here").openPopup();
+    loadTrips();
 });
 
-function route(){
-fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${destination.value}`)
-.then(r=>r.json()).then(d=>{
-let dest=[d[0].lat,d[0].lon];
-if(routeLine) map.removeLayer(routeLine);
-routeLine=L.polyline([userLoc,dest],{color:'#7c4dff'}).addTo(map);
-map.fitBounds(routeLine.getBounds());
-});
+// Routing with turn-by-turn + ETA
+function routeFromTo(start,end){
+    if(routingControl) map.removeControl(routingControl);
+
+    routingControl=L.Routing.control({
+        waypoints:[L.latLng(start),L.latLng(end)],
+        addWaypoints:false,
+        draggableWaypoints:false,
+        routeWhileDragging:false,
+        show:false,
+        createMarker:()=>null,
+        lineOptions:{styles:[{color:'#7c4dff',weight:6}]}
+    })
+    .on('routesfound',e=>{
+        const r=e.routes[0];
+        document.getElementById("eta").innerText =
+            Math.round(r.summary.totalTime/60)+" mins";
+        document.getElementById("distanceInfo").innerText =
+            (r.summary.totalDistance/1000).toFixed(2)+" km";
+
+        let html="";
+        r.instructions.forEach(i=>{
+            html+=`<div>➡️ ${i.text}</div>`;
+        });
+        document.getElementById("directions").innerHTML=html;
+    })
+    .addTo(map);
 }
 
-function routeFromSaved(placeName){
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`)
-    .then(res => res.json())
-    .then(data => {
-        if(!data.length) return alert("Location not found");
-
-        let dest = [data[0].lat, data[0].lon];
-
-        if(routeLine) map.removeLayer(routeLine);
-
-        routeLine = L.polyline([userLoc, dest], {
-            color: "#7c4dff",
-            weight: 5
-        }).addTo(map);
-
-        map.fitBounds(routeLine.getBounds());
+// Route from input
+function route(){
+    if(!destination.value) return alert("Enter destination");
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destination.value)}`)
+    .then(r=>r.json()).then(d=>{
+        if(!d.length) return alert("Not found");
+        routeFromTo(userLoc,[+d[0].lat,+d[0].lon]);
     });
 }
 
-
+// Save trip (max 6)
 function saveTrip(){
-    const dest = destination.value.trim();
+    const dest=destination.value.trim();
     if(!dest) return alert("Enter destination");
-
-    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
-
-    // Prevent duplicate
-    if(trips.includes(dest)){
-        return alert("This destination is already saved");
-    }
-
-    // Limit to 6 trips
-    if(trips.length >= 6){
-        return alert("You can save only 6 trips");
-    }
-
+    let trips=JSON.parse(localStorage.getItem("trips")||"[]");
+    if(trips.includes(dest)) return alert("Already saved");
+    if(trips.length>=6) return alert("Max 6 trips allowed");
     trips.push(dest);
-    localStorage.setItem("trips", JSON.stringify(trips));
+    localStorage.setItem("trips",JSON.stringify(trips));
     loadTrips();
 }
 
-
-
+// Load & delete trips
 function loadTrips(){
-    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
-    tripList.innerHTML = "";
-
-    trips.forEach((t, index) => {
-        let li = document.createElement("li");
-        li.style.display = "flex";
-        li.style.justifyContent = "space-between";
-        li.style.alignItems = "center";
-        li.style.cursor = "pointer";
-        li.style.marginBottom = "8px";
-
-        // Trip name (click = route)
-        let name = document.createElement("span");
-        name.innerText = "📍 " + t;
-        name.onclick = () => routeFromSaved(t);
-
-        // Delete button
-        let del = document.createElement("span");
-        del.innerText = "❌";
-        del.style.cursor = "pointer";
-        del.onclick = () => deleteTrip(index);
-
-        li.appendChild(name);
-        li.appendChild(del);
+    let trips=JSON.parse(localStorage.getItem("trips")||"[]");
+    tripList.innerHTML="";
+    trips.forEach((t,i)=>{
+        let li=document.createElement("li");
+        li.innerHTML=`<span style="cursor:pointer">📍 ${t}</span> <span style="cursor:pointer">❌</span>`;
+        li.children[0].onclick=()=>routeFromSaved(t);
+        li.children[1].onclick=()=>deleteTrip(i);
         tripList.appendChild(li);
     });
 }
-
-function deleteTrip(index){
-    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
-    trips.splice(index, 1);
-    localStorage.setItem("trips", JSON.stringify(trips));
+function deleteTrip(i){
+    let trips=JSON.parse(localStorage.getItem("trips")||"[]");
+    trips.splice(i,1);
+    localStorage.setItem("trips",JSON.stringify(trips));
     loadTrips();
 }
+function routeFromSaved(t){
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(t)}`)
+    .then(r=>r.json()).then(d=>{
+        routeFromTo(userLoc,[+d[0].lat,+d[0].lon]);
+    });
+}
 
-
+// Nearest fuel
 function findFuel(){
-fetch(`https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,${userLoc[0]},${userLoc[1]})[amenity=fuel];out;`)
-.then(r=>r.json()).then(d=>{
-let nearest=d.elements[0],min=Infinity;
-d.elements.forEach(p=>{
-let dist=map.distance(userLoc,[p.lat,p.lon]);
-if(dist<min){min=dist;nearest=p;}
-});
-L.marker([nearest.lat,nearest.lon]).addTo(map)
-.bindPopup("⛽ Nearest fuel "+(min/1000).toFixed(2)+" km").openPopup();
-});
+    fetch(`https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,${userLoc[0]},${userLoc[1]})[amenity=fuel];out;`)
+    .then(r=>r.json()).then(d=>{
+        let nearest=d.elements[0],min=Infinity;
+        d.elements.forEach(p=>{
+            let dist=map.distance(userLoc,[p.lat,p.lon]);
+            if(dist<min){min=dist;nearest=p;}
+        });
+        L.marker([nearest.lat,nearest.lon]).addTo(map)
+        .bindPopup(`⛽ Nearest fuel ${(min/1000).toFixed(2)} km`).openPopup();
+    });
 }
 
+// Mileage
 function calcMileage(){
-let f=parseFloat(fuel.value);
-let d=parseFloat(distance.value);
-if(!f||!d) return;
-mileageResult.innerText="Mileage: "+(d/f).toFixed(2)+" km/l";
+    let f=+fuel.value,d=+distance.value;
+    if(!f||!d) return;
+    mileageResult.innerText=`Mileage: ${(d/f).toFixed(2)} km/l`;
 }
 
+// Service
 function checkService(){
-let l=parseInt(lastService.value);
-let c=parseInt(currentKm.value);
-serviceResult.innerText=(c-l)>=3000?"⚠️ Service Due":"✅ Service OK";
+    let l=+lastService.value,c=+currentKm.value;
+    serviceResult.innerText=(c-l)>=3000?"⚠️ Service Due":"✅ Service OK";
 }
 
-
+// RTO
 function openRTO(){
-    const v = document.getElementById("vehicleNo").value;
-    if(!v) return alert("Enter vehicle number");
-
-    window.open(
-        "https://vahan.parivahan.gov.in/vahanservice/vahan/ui/statevalidation/homepage.xhtml",
-        "_blank"
-    );
+    if(!vehicleNo.value) return alert("Enter vehicle number");
+    window.open("https://vahan.parivahan.gov.in","_blank");
 }
 
+// Theme
 function toggleTheme(){
-document.body.classList.toggle("light-mode");
+    document.body.classList.toggle("light-mode");
 }
 </script>
+
 </body>
 </html>
