@@ -1,337 +1,226 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parts & Prices - Bike Care & Travel</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Inline CSS with Animations -->
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fa;
-            color: #1a2a44;
-            animation: fadeInBody 1.5s ease-in-out;
-        }
-        @keyframes fadeInBody {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .navbar {
-            background-color: #1a2a44;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            animation: slideDown 1s ease-out;
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-            font-size: 1.5rem;
-        }
-        .nav-link {
-            color: #c0c7d6 !important;
-            font-weight: 500;
-            transition: color 0.3s, transform 0.3s;
-        }
-        .nav-link:hover {
-            color: #fff !important;
-            transform: scale(1.1);
-        }
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 2rem;
-            position: relative;
-            display: inline-block;
-            animation: fadeInLeft 1s ease-in;
-        }
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 50%;
-            height: 3px;
-            background-color: #1a2a44;
-            animation: underline 1s ease-in forwards;
-        }
-        @keyframes underline {
-            from { width: 0; }
-            to { width: 50%; }
-        }
-        table {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 10px;
-            overflow: hidden;
-            animation: fadeIn 1s ease-in;
-        }
-        th {
-            background-color: #1a2a44;
-            color: #fff;
-        }
-        tr:hover {
-            background-color: #e6eaf0;
-            transition: background-color 0.3s;
-        }
-        .btn-premium {
-            background-color: #1a2a44;
-            color: #fff;
-            border-radius: 50px;
-            padding: 8px 16px;
-            border: none;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .btn-premium:hover {
-            background-color: #2a4066;
-            transform: scale(1.1) rotate(5deg);
-        }
-        footer {
-            background-color: #1a2a44;
-            color: #c0c7d6;
-            padding: 2rem 0;
-            text-align: center;
-            animation: fadeInFooter 2s ease-in;
-        }
-        @keyframes fadeInFooter {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .modal-content {
-            border-radius: 15px;
-            border: none;
-            animation: zoomInModal 0.5s ease;
-        }
-        @keyframes zoomInModal {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-header {
-            background-color: #1a2a44;
-            color: #fff;
-            border-radius: 15px 15px 0 0;
-        }
-        .widget-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            margin-bottom: 2rem;
-            animation: slideUp 0.8s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        #searchResults {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: fadeIn 1s ease-in;
-        }
-        #searchResults h5 {
-            color: #1a2a44;
-        }
-        #searchResults p {
-            color: #333333;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Bike Care & Travel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+:root{
+--dark-bg:#0b0b12;
+--dark-card:#151523;
+--light-bg:#f4f7fa;
+--primary:#7c4dff;
+--text-dark:#e0e0ff;
+--text-light:#1a2a44;
+}
+body{font-family:Montserrat;background:var(--dark-bg);color:var(--text-dark)}
+.light-mode{background:var(--light-bg);color:var(--text-light)}
+.navbar{background:#0b0b12}
+.card{background:var(--dark-card);border-radius:16px}
+.light-mode .card{background:#ffffff;color:#1a2a44}
+.btn-premium{background:linear-gradient(135deg,#7c4dff,#512da8);color:#fff;border-radius:50px;padding:10px 22px}
+#map{height:420px;border-radius:20px}
+</style>
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">🏍️ Bike Care & Travel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="parts.html">Parts & Prices</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar navbar-dark px-3">
+<span class="navbar-brand">🏍 Bike Care</span>
+<div>
+<button class="btn btn-sm btn-premium me-2" onclick="toggleTheme()">🌙 / ☀️</button>
+<a href="parts.html" class="btn btn-sm btn-premium">Parts</a>
+</div>
+</nav>
 
-    <!-- Add New Part Form -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">Add New Part to Database</h2>
-            <div class="widget-card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <input type="text" id="newPartType" class="form-control" placeholder="Type (e.g., Bike)">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <input type="text" id="newPartName" class="form-control" placeholder="Part Name (e.g., Tyre)">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <input type="text" id="newPartPrice" class="form-control" placeholder="Price (e.g., 1500)">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <button class="btn btn-premium w-100" onclick="addNewPart()"><i class="fas fa-plus"></i> Add Part</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="container py-4">
+<h4>📍 Map</h4>
+<div id="map"></div>
 
-    <!-- Parts Search Widget -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">Search for Vehicle Parts</h2>
-            <div class="widget-card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <select id="vehicleType" class="form-select">
-                                <option value="bike">Bike</option>
-                                <option value="car">Car</option>
-                                <option value="other">Other Vehicle</option>
-                            </select>
-                        </div>
-                        <div class="col-md-7 mb-3">
-                            <input type="text" id="partName" class="form-control" placeholder="Enter part name (e.g., Tyre)">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <button class="btn btn-premium w-100" onclick="searchPart()"><i class="fas fa-search"></i> Search</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="searchResults"></div>
-        </div>
-    </section>
+<input id="destination" class="form-control mt-3" placeholder="Enter destination">
+<button class="btn btn-premium mt-2" onclick="route()">🧭 Route</button>
+<button class="btn btn-premium mt-2 ms-2" onclick="saveTrip()">💾 Save Trip</button>
+<button class="btn btn-premium mt-2 ms-2" onclick="findFuel()">⛽ Nearest Fuel</button>
 
-    <!-- Parts & Prices Section -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">🔧 Parts & Prices</h2>
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Part</th>
-                        <th>Price (₹)</th>
-                        <th>Info</th>
-                    </tr>
-                </thead>
-                <tbody id="partsTableBody">
-                    <!-- Parts will be populated from localStorage -->
-                </tbody>
-            </table>
-        </div>
-    </section>
+<h5 class="mt-3">Saved Trips</h5>
+<ul id="tripList"></ul>
+</div>
 
-    <!-- Modals for Part Information -->
-    <!-- (Keep the existing modals here, but since we're using DB, they can be dynamic if needed) -->
-    <!-- For simplicity, keeping static modals, but you can make them dynamic based on DB -->
+<div class="container py-4">
+<h4>🏍 Mileage Tracker</h4>
+<input id="fuel" class="form-control mb-2" placeholder="Fuel Filled (litres)">
+<input id="distance" class="form-control mb-2" placeholder="Distance Covered (km)">
+<button class="btn btn-premium" onclick="calcMileage()">Calculate</button>
+<p id="mileageResult" class="mt-2"></p>
+</div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Bike Care & Travel. All rights reserved.</p>
-    </footer>
+<div class="container py-4">
+<h4>🔧 Service Tracker</h4>
+<input id="lastService" class="form-control mb-2" placeholder="Last Service KM">
+<input id="currentKm" class="form-control mb-2" placeholder="Current KM">
+<button class="btn btn-premium" onclick="checkService()">Check Service</button>
+<p id="serviceResult" class="mt-2"></p>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Parts DB and Search Script -->
-    <script>
-        // Initialize Parts Database in localStorage
-        function initPartsDB() {
-            if (!localStorage.getItem('parts')) {
-                const initialParts = [
-                    { type: 'Bike', part: 'Tyre', price: 1500, desc: 'High-grip rubber, puncture-resistant, suitable for all terrains.' },
-                    { type: 'Bike', part: 'Brake Pads', price: 800, desc: 'Ceramic compound, low noise, high durability.' },
-                    { type: 'Bike', part: 'Chain Set', price: 2000, desc: 'Rust-resistant, high-tensile strength, low maintenance.' },
-                    { type: 'Car', part: 'Battery', price: 4500, desc: 'Maintenance-free, high cranking power, long warranty.' },
-                    { type: 'Car', part: 'Engine Oil (4L)', price: 2000, desc: 'Synthetic blend, high viscosity, thermal stability.' },
-                    { type: 'Car', part: 'Air Filter', price: 1200, desc: 'High-flow design, washable, eco-friendly.' }
-                ];
-                localStorage.setItem('parts', JSON.stringify(initialParts));
-            }
-            renderPartsTable();
-        }
+<div class="container py-4">
+<h4>🚘 Vehicle Information (RTO)</h4>
 
-        function renderPartsTable() {
-            const parts = JSON.parse(localStorage.getItem('parts') || '[]');
-            const tableBody = document.getElementById('partsTableBody');
-            tableBody.innerHTML = '';
-            parts.forEach(part => {
-                const row = `
-                    <tr>
-                        <td>${part.type}</td>
-                        <td>${part.part}</td>
-                        <td>${part.price}</td>
-                        <td><button class="btn btn-premium" onclick="showPartInfo('${part.part}', '${part.desc}')"><i class="fas fa-info-circle"></i> More Info</button></td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
+<input id="vehicleNo" class="form-control mb-2"
+placeholder="Enter Vehicle Number (e.g. MH12AB1234)">
 
-        function addNewPart() {
-            const type = document.getElementById('newPartType').value.trim();
-            const part = document.getElementById('newPartName').value.trim();
-            const price = parseInt(document.getElementById('newPartPrice').value.trim());
-            if (!type || !part || isNaN(price)) {
-                alert('Please enter valid type, part name, and price.');
-                return;
-            }
-            const parts = JSON.parse(localStorage.getItem('parts') || '[]');
-            parts.push({ type, part, price, desc: 'No description added yet.' }); // Add desc as empty for new parts
-            localStorage.setItem('parts', JSON.stringify(parts));
-            renderPartsTable();
-            document.getElementById('newPartType').value = '';
-            document.getElementById('newPartName').value = '';
-            document.getElementById('newPartPrice').value = '';
-        }
+<button class="btn btn-premium" onclick="openRTO()">
+Check Vehicle Details
+</button>
+</div>
 
-        function searchPart() {
-            const vehicle = document.getElementById('vehicleType').value;
-            const part = document.getItem('partName').value.trim().toLowerCase();
-            if (!part) {
-                alert('Please enter a part name.');
-                return;
-            }
-            const parts = JSON.parse(localStorage.getItem('parts') || '[]');
-            const results = parts.filter(p => p.type.toLowerCase() === vehicle.toLowerCase() && p.part.toLowerCase().includes(part));
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '';
-            if (results.length > 0) {
-                results.forEach(result => {
-                    resultsDiv.innerHTML += `
-                        <h5>${result.part}</h5>
-                        <p><strong>Price:</strong> ₹${result.price}</p>
-                        <p><strong>Description:</strong> ${result.desc}</p>
-                    `;
-                });
-            } else {
-                resultsDiv.innerHTML = '<p>No results found in the database.</p>';
-            }
-        }
 
-        function showPartInfo(part, desc) {
-            alert(`Part: ${part}\nDescription: ${desc}`);
-            // You can replace with a modal if needed
-        }
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map,userLoc,routeLine;
 
-        // Initialize on load
-        initPartsDB();
-    </script>
+navigator.geolocation.getCurrentPosition(p=>{
+userLoc=[p.coords.latitude,p.coords.longitude];
+map=L.map('map').setView(userLoc,14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.marker(userLoc).addTo(map).bindPopup("You are here").openPopup();
+loadTrips();
+});
+
+function route(){
+fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${destination.value}`)
+.then(r=>r.json()).then(d=>{
+let dest=[d[0].lat,d[0].lon];
+if(routeLine) map.removeLayer(routeLine);
+routeLine=L.polyline([userLoc,dest],{color:'#7c4dff'}).addTo(map);
+map.fitBounds(routeLine.getBounds());
+});
+}
+
+function routeFromSaved(placeName){
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`)
+    .then(res => res.json())
+    .then(data => {
+        if(!data.length) return alert("Location not found");
+
+        let dest = [data[0].lat, data[0].lon];
+
+        if(routeLine) map.removeLayer(routeLine);
+
+        routeLine = L.polyline([userLoc, dest], {
+            color: "#7c4dff",
+            weight: 5
+        }).addTo(map);
+
+        map.fitBounds(routeLine.getBounds());
+    });
+}
+
+
+function saveTrip(){
+    const dest = destination.value.trim();
+    if(!dest) return alert("Enter destination");
+
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+
+    // Prevent duplicate
+    if(trips.includes(dest)){
+        return alert("This destination is already saved");
+    }
+
+    // Limit to 6 trips
+    if(trips.length >= 6){
+        return alert("You can save only 6 trips");
+    }
+
+    trips.push(dest);
+    localStorage.setItem("trips", JSON.stringify(trips));
+    loadTrips();
+}
+
+
+
+function loadTrips(){
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+    tripList.innerHTML = "";
+
+    trips.forEach((t, index) => {
+        let li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+        li.style.cursor = "pointer";
+        li.style.marginBottom = "8px";
+
+        // Trip name (click = route)
+        let name = document.createElement("span");
+        name.innerText = "📍 " + t;
+        name.onclick = () => routeFromSaved(t);
+
+        // Delete button
+        let del = document.createElement("span");
+        del.innerText = "❌";
+        del.style.cursor = "pointer";
+        del.onclick = () => deleteTrip(index);
+
+        li.appendChild(name);
+        li.appendChild(del);
+        tripList.appendChild(li);
+    });
+}
+
+function deleteTrip(index){
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+    trips.splice(index, 1);
+    localStorage.setItem("trips", JSON.stringify(trips));
+    loadTrips();
+}
+
+
+function findFuel(){
+fetch(`https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,${userLoc[0]},${userLoc[1]})[amenity=fuel];out;`)
+.then(r=>r.json()).then(d=>{
+let nearest=d.elements[0],min=Infinity;
+d.elements.forEach(p=>{
+let dist=map.distance(userLoc,[p.lat,p.lon]);
+if(dist<min){min=dist;nearest=p;}
+});
+L.marker([nearest.lat,nearest.lon]).addTo(map)
+.bindPopup("⛽ Nearest fuel "+(min/1000).toFixed(2)+" km").openPopup();
+});
+}
+
+function calcMileage(){
+let f=parseFloat(fuel.value);
+let d=parseFloat(distance.value);
+if(!f||!d) return;
+mileageResult.innerText="Mileage: "+(d/f).toFixed(2)+" km/l";
+}
+
+function checkService(){
+let l=parseInt(lastService.value);
+let c=parseInt(currentKm.value);
+serviceResult.innerText=(c-l)>=3000?"⚠️ Service Due":"✅ Service OK";
+}
+
+
+function openRTO(){
+    const v = document.getElementById("vehicleNo").value;
+    if(!v) return alert("Enter vehicle number");
+
+    window.open(
+        "https://vahan.parivahan.gov.in/vahanservice/vahan/ui/statevalidation/homepage.xhtml",
+        "_blank"
+    );
+}
+
+function toggleTheme(){
+document.body.classList.toggle("light-mode");
+}
+</script>
 </body>
 </html>
