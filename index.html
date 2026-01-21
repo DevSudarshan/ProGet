@@ -1,393 +1,226 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bike Care & Travel</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Inline CSS with Animations -->
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fa;
-            color: #1a2a44;
-            animation: fadeInBody 1.5s ease-in-out;
-        }
-        @keyframes fadeInBody {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .navbar {
-            background-color: #1a2a44;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            animation: slideDown 1s ease-out;
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-            font-size: 1.5rem;
-        }
-        .nav-link {
-            color: #c0c7d6 !important;
-            font-weight: 500;
-            transition: color 0.3s, transform 0.3s;
-        }
-        .nav-link:hover {
-            color: #fff !important;
-            transform: scale(1.1);
-        }
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://source.unsplash.com/random/1920x1080/?motorcycle');
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-            padding: 150px 0;
-            text-align: center;
-            border-radius: 0 0 20px 20px;
-            animation: zoomIn 1.5s ease-in-out;
-        }
-        @keyframes zoomIn {
-            from { transform: scale(1.1); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            animation: bounceIn 1s ease;
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 2rem;
-            position: relative;
-            display: inline-block;
-            animation: fadeInLeft 1s ease-in;
-        }
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 50%;
-            height: 3px;
-            background-color: #1a2a44;
-            animation: underline 1s ease-in forwards;
-        }
-        @keyframes underline {
-            from { width: 0; }
-            to { width: 50%; }
-        }
-        #map {
-            height: 450px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: fadeIn 1s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .location-card, .form-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            animation: slideUp 0.8s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .location-card:hover, .form-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-        }
-        .btn-premium {
-            background-color: #1a2a44;
-            color: #fff;
-            border-radius: 50px;
-            padding: 10px 20px;
-            border: none;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .btn-premium:hover {
-            background-color: #2a4066;
-            transform: scale(1.1) rotate(5deg);
-        }
-        .btn-delete {
-            background-color: #dc3545;
-            color: #fff;
-            border-radius: 50px;
-            padding: 8px 16px;
-            border: none;
-            transition: background-color 0.3s, transform 0.3s;
-            margin-top: 10px;
-        }
-        .btn-delete:hover {
-            background-color: #b02a37;
-            transform: scale(1.1) rotate(-5deg);
-        }
-        footer {
-            background-color: #1a2a44;
-            color: #c0c7d6;
-            padding: 2rem 0;
-            text-align: center;
-            margin-top: 2rem;
-            animation: fadeInFooter 2s ease-in;
-        }
-        @keyframes fadeInFooter {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card-body i {
-            font-size: 1.5rem;
-            margin-right: 10px;
-            color: #1a2a44;
-            transition: color 0.3s;
-        }
-        .card-body i:hover {
-            color: #2a4066;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Bike Care & Travel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+:root{
+--dark-bg:#0b0b12;
+--dark-card:#151523;
+--light-bg:#f4f7fa;
+--primary:#7c4dff;
+--text-dark:#e0e0ff;
+--text-light:#1a2a44;
+}
+body{font-family:Montserrat;background:var(--dark-bg);color:var(--text-dark)}
+.light-mode{background:var(--light-bg);color:var(--text-light)}
+.navbar{background:#0b0b12}
+.card{background:var(--dark-card);border-radius:16px}
+.light-mode .card{background:#ffffff;color:#1a2a44}
+.btn-premium{background:linear-gradient(135deg,#7c4dff,#512da8);color:#fff;border-radius:50px;padding:10px 22px}
+#map{height:420px;border-radius:20px}
+</style>
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">🏍️ Bike Care & Travel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="parts.html">Parts & Prices</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar navbar-dark px-3">
+<span class="navbar-brand">🏍 Bike Care</span>
+<div>
+<button class="btn btn-sm btn-premium me-2" onclick="toggleTheme()">🌙 / ☀️</button>
+<a href="parts.html" class="btn btn-sm btn-premium">Parts</a>
+</div>
+</nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Welcome to Bike Care & Travel</h1>
-            <p>Your premium hub for vehicle maintenance and travel planning.</p>
-        </div>
-    </section>
+<div class="container py-4">
+<h4>📍 Map</h4>
+<div id="map"></div>
 
-    <!-- Add Location Form -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">Add Custom Location</h2>
-            <div class="card form-card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <input type="text" id="locationName" class="form-control" placeholder="Location Name (e.g., My Home)">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <input type="text" id="locationAddress" class="form-control" placeholder="Address (e.g., 123 Main St, New Delhi, India)">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <button class="btn btn-premium w-100" onclick="addLocation()"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<input id="destination" class="form-control mt-3" placeholder="Enter destination">
+<button class="btn btn-premium mt-2" onclick="route()">🧭 Route</button>
+<button class="btn btn-premium mt-2 ms-2" onclick="saveTrip()">💾 Save Trip</button>
+<button class="btn btn-premium mt-2 ms-2" onclick="findFuel()">⛽ Nearest Fuel</button>
 
-    <!-- Saved Locations Section -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">Saved Locations</h2>
-            <div class="row" id="locationCards"></div>
-        </div>
-    </section>
+<h5 class="mt-3">Saved Trips</h5>
+<ul id="tripList"></ul>
+</div>
 
-    <!-- Map Section -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="section-title">Interactive Map</h2>
-            <div id="map"></div>
-            <div class="mt-4">
-                <button class="btn btn-premium" onclick="findNearby('fuel')"><i class="fas fa-gas-pump"></i> Find Nearby Fuel Stations</button>
-                <button class="btn btn-premium ms-2" onclick="findNearby('car_repair')"><i class="fas fa-tools"></i> Find Nearby Tyre Shops</button>
-            </div>
-        </div>
-    </section>
+<div class="container py-4">
+<h4>🏍 Mileage Tracker</h4>
+<input id="fuel" class="form-control mb-2" placeholder="Fuel Filled (litres)">
+<input id="distance" class="form-control mb-2" placeholder="Distance Covered (km)">
+<button class="btn btn-premium" onclick="calcMileage()">Calculate</button>
+<p id="mileageResult" class="mt-2"></p>
+</div>
 
-    <!-- RTO Vehicle Search -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">RTO Vehicle Search</h2>
-            <p>Search for vehicle information via the official RTO portal.</p>
-            <a href="https://vahan.parivahan.gov.in/vahanservice/vahan/ui/statevalidation/homepage.xhtml" target="_blank" class="btn btn-premium"><i class="fas fa-search"></i> Search Vehicle Info</a>
-        </div>
-    </section>
+<div class="container py-4">
+<h4>🔧 Service Tracker</h4>
+<input id="lastService" class="form-control mb-2" placeholder="Last Service KM">
+<input id="currentKm" class="form-control mb-2" placeholder="Current KM">
+<button class="btn btn-premium" onclick="checkService()">Check Service</button>
+<p id="serviceResult" class="mt-2"></p>
+</div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Bike Care & Travel. All rights reserved.</p>
-    </footer>
+<div class="container py-4">
+<h4>🚘 Vehicle Information (RTO)</h4>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Map and Location Script -->
-    <script>
-        let map, userLocation, markers = [];
+<input id="vehicleNo" class="form-control mb-2"
+placeholder="Enter Vehicle Number (e.g. MH12AB1234)">
 
-        // Initialize Leaflet map
-        function initMap() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    userLocation = [position.coords.latitude, position.coords.longitude];
-                    map = L.map('map').setView(userLocation, 14);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-                    loadSavedLocations();
-                }, () => {
-                    alert('Geolocation failed. Using default location.');
-                    userLocation = [28.6139, 77.2090]; // Default to New Delhi
-                    map = L.map('map').setView(userLocation, 14);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-                    loadSavedLocations();
-                });
-            }
-        }
+<button class="btn btn-premium" onclick="openRTO()">
+Check Vehicle Details
+</button>
+</div>
 
-        function addMarker(coords, title) {
-            const marker = L.marker(coords).addTo(map).bindPopup(title);
-            markers.push(marker);
-        }
 
-        function addLocation() {
-            const name = document.getElementById('locationName').value.trim();
-            const address = document.getElementById('locationAddress').value.trim();
-            if (!name || !address) {
-                alert('Please enter both a name and address.');
-                return;
-            }
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map,userLoc,routeLine;
 
-            // Geocode address using Nominatim
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        const lat = parseFloat(data[0].lat);
-                        const lon = parseFloat(data[0].lon);
-                        const location = { name, address, lat, lon };
-                        saveLocation(location);
-                        renderLocations();
-                        addMarker([lat, lon], name);
-                        document.getElementById('locationName').value = '';
-                        document.getElementById('locationAddress').value = '';
-                    } else {
-                        alert('Address not found. Please try a more specific address.');
-                    }
-                })
-                .catch(() => alert('Error geocoding address.'));
-        }
+navigator.geolocation.getCurrentPosition(p=>{
+userLoc=[p.coords.latitude,p.coords.longitude];
+map=L.map('map').setView(userLoc,14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.marker(userLoc).addTo(map).bindPopup("You are here").openPopup();
+loadTrips();
+});
 
-        function saveLocation(location) {
-            const locations = JSON.parse(localStorage.getItem('locations') || '[]');
-            locations.push(location);
-            localStorage.setItem('locations', JSON.stringify(locations));
-        }
+function route(){
+fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${destination.value}`)
+.then(r=>r.json()).then(d=>{
+let dest=[d[0].lat,d[0].lon];
+if(routeLine) map.removeLayer(routeLine);
+routeLine=L.polyline([userLoc,dest],{color:'#7c4dff'}).addTo(map);
+map.fitBounds(routeLine.getBounds());
+});
+}
 
-        function loadSavedLocations() {
-            renderLocations();
-        }
+function routeFromSaved(placeName){
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`)
+    .then(res => res.json())
+    .then(data => {
+        if(!data.length) return alert("Location not found");
 
-        function renderLocations() {
-            const locations = JSON.parse(localStorage.getItem('locations') || '[]');
-            const container = document.getElementById('locationCards');
-            container.innerHTML = '';
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            locations.forEach((loc, index) => {
-                addMarker([loc.lat, loc.lon], loc.name);
-                const card = document.createElement('div');
-                card.className = 'col-md-4 mb-4';
-                card.innerHTML = `
-                    <div class="card location-card">
-                        <div class="card-body">
-                            <h5><i class="fas fa-map-marker-alt"></i> ${loc.name}</h5>
-                            <p>${loc.address}</p>
-                            <button class="btn btn-premium" onclick="viewOnMap(${loc.lat}, ${loc.lon}, '${loc.name}')">View on Map</button>
-                            <button class="btn btn-delete w-100" onclick="deleteLocation(${index})"><i class="fas fa-trash"></i> Delete</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+        let dest = [data[0].lat, data[0].lon];
 
-        function deleteLocation(index) {
-            const locations = JSON.parse(localStorage.getItem('locations') || '[]');
-            locations.splice(index, 1);
-            localStorage.setItem('locations', JSON.stringify(locations));
-            renderLocations();
-        }
+        if(routeLine) map.removeLayer(routeLine);
 
-        function viewOnMap(lat, lng, title) {
-            map.setView([lat, lng], 16);
-            markers.forEach(marker => {
-                if (marker.getPopup().getContent() === title) {
-                    marker.openPopup();
-                }
-            });
-            const osmUrl = `https://www.openstreetmap.org/directions?from=${userLocation[0]},${userLocation[1]}&to=${lat},${lng}`;
-            window.open(osmUrl, '_blank');
-        }
+        routeLine = L.polyline([userLoc, dest], {
+            color: "#7c4dff",
+            weight: 5
+        }).addTo(map);
 
-        function findNearby(type) {
-            const query = type === 'fuel' ? '[amenity=fuel]' : '[shop=tyres]';
-            fetch(`https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,${userLocation[0]},${userLocation[1]})${query};out;`)
-                .then(response => response.json())
-                .then(data => {
-                    markers.forEach(marker => map.removeLayer(marker));
-                    markers = [];
-                    addMarker(userLocation, 'Your Location 📍');
-                    data.elements.forEach(place => {
-                        const coords = [place.lat, place.lon];
-                        const name = place.tags.name || type;
-                        addMarker(coords, name);
-                    });
-                    if (data.elements.length === 0) {
-                        alert('No places found nearby.');
-                    }
-                })
-                .catch(() => alert('Error fetching places.'));
-        }
+        map.fitBounds(routeLine.getBounds());
+    });
+}
 
-        initMap();
-    </script>
+
+function saveTrip(){
+    const dest = destination.value.trim();
+    if(!dest) return alert("Enter destination");
+
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+
+    // Prevent duplicate
+    if(trips.includes(dest)){
+        return alert("This destination is already saved");
+    }
+
+    // Limit to 6 trips
+    if(trips.length >= 6){
+        return alert("You can save only 6 trips");
+    }
+
+    trips.push(dest);
+    localStorage.setItem("trips", JSON.stringify(trips));
+    loadTrips();
+}
+
+
+
+function loadTrips(){
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+    tripList.innerHTML = "";
+
+    trips.forEach((t, index) => {
+        let li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+        li.style.cursor = "pointer";
+        li.style.marginBottom = "8px";
+
+        // Trip name (click = route)
+        let name = document.createElement("span");
+        name.innerText = "📍 " + t;
+        name.onclick = () => routeFromSaved(t);
+
+        // Delete button
+        let del = document.createElement("span");
+        del.innerText = "❌";
+        del.style.cursor = "pointer";
+        del.onclick = () => deleteTrip(index);
+
+        li.appendChild(name);
+        li.appendChild(del);
+        tripList.appendChild(li);
+    });
+}
+
+function deleteTrip(index){
+    let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+    trips.splice(index, 1);
+    localStorage.setItem("trips", JSON.stringify(trips));
+    loadTrips();
+}
+
+
+function findFuel(){
+fetch(`https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,${userLoc[0]},${userLoc[1]})[amenity=fuel];out;`)
+.then(r=>r.json()).then(d=>{
+let nearest=d.elements[0],min=Infinity;
+d.elements.forEach(p=>{
+let dist=map.distance(userLoc,[p.lat,p.lon]);
+if(dist<min){min=dist;nearest=p;}
+});
+L.marker([nearest.lat,nearest.lon]).addTo(map)
+.bindPopup("⛽ Nearest fuel "+(min/1000).toFixed(2)+" km").openPopup();
+});
+}
+
+function calcMileage(){
+let f=parseFloat(fuel.value);
+let d=parseFloat(distance.value);
+if(!f||!d) return;
+mileageResult.innerText="Mileage: "+(d/f).toFixed(2)+" km/l";
+}
+
+function checkService(){
+let l=parseInt(lastService.value);
+let c=parseInt(currentKm.value);
+serviceResult.innerText=(c-l)>=3000?"⚠️ Service Due":"✅ Service OK";
+}
+
+
+function openRTO(){
+    const v = document.getElementById("vehicleNo").value;
+    if(!v) return alert("Enter vehicle number");
+
+    window.open(
+        "https://vahan.parivahan.gov.in/vahanservice/vahan/ui/statevalidation/homepage.xhtml",
+        "_blank"
+    );
+}
+
+function toggleTheme(){
+document.body.classList.toggle("light-mode");
+}
+</script>
 </body>
 </html>
